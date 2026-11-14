@@ -64,8 +64,20 @@ expect() {
  expect "pre-release tags are ignored" true 1.2.4 patch)
 (new_repo; tag v1.2.3; tag v1.10.0; commit "fix: x"
  expect "tags sort numerically" true 1.10.1 patch)
-(new_repo; tag v0.3.0; commit "feat!: first breaking change"
- expect "0.x follows the same rules" true 1.0.0 major)
+(new_repo; tag v0.3.5; commit "feat!: breaking change"
+ expect "0.x holds the major: feat! raises the minor" true 0.4.0 minor)
+(new_repo; tag v0.3.5; commit "fix(ui)!: breaking change"
+ expect "0.x holds the major: fix! raises the minor" true 0.4.0 minor)
+(new_repo; tag v0.3.5; git commit -q --allow-empty -m "fix: x" -m "BREAKING CHANGE: the format changed"
+ expect "0.x holds the major: footer raises the minor" true 0.4.0 minor)
+(new_repo; tag v0.3.5; commit "feat: a"; commit "fix!: b"
+ expect "0.x holds the major: mixed commits" true 0.4.0 minor)
+(new_repo; tag v0.3.5; commit "fix: a"
+ expect "0.x patches are unchanged" true 0.3.6 patch)
+(new_repo; tag v0.3.5; commit "feat: a"
+ expect "0.x features are unchanged" true 0.4.0 minor)
+(new_repo; tag v1.0.0; commit "feat!: breaking change"
+ expect "from 1.x the major applies again" true 2.0.0 major)
 (new_repo; tag v1.2.3; commit "feature: not conventional"; commit "Update stuff"
  expect "unknown subjects release nothing" false "" none)
 

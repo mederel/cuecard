@@ -1,10 +1,10 @@
 name: Release
 
 # On every push to main: compute the next semantic version from the
-# Conventional Commits since the last tag, build the web and Android
-# deliverables from `app/`, then tag and publish a GitHub release.
-#
-# Nothing is built or released until `app/Cargo.toml` exists.
+# Conventional Commits since the last tag, then tag and publish a GitHub
+# release. The web and Android deliverables are built from `app/` and attached
+# to the release as soon as `app/Cargo.toml` exists; until then a release has
+# notes only.
 
 on:
   push:
@@ -35,6 +35,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       release: ${{ steps.next.outputs.release }}
+      has_app: ${{ steps.app.outputs.has_app }}
       version: ${{ steps.next.outputs.version }}
       bump: ${{ steps.next.outputs.bump }}
       previous: ${{ steps.next.outputs.previous }}
@@ -44,18 +45,15 @@ jobs:
           fetch-depth: 0
           fetch-tags: true
       - id: next
+        run: bash .github/scripts/next-version.sh | tee -a "$GITHUB_OUTPUT"
+      - id: app
         run: |
-          out=$(bash .github/scripts/next-version.sh)
-          if [ ! -f app/Cargo.toml ]; then
-            echo "No app/Cargo.toml yet: nothing to deliver, no release."
-            out=$(printf '%s\n' "$out" | grep -v '^release=')
-            out+=$'\nrelease=false'
-          fi
-          echo "$out" | tee -a "$GITHUB_OUTPUT"
+          if [ -f app/Cargo.toml ]; then has_app=true; else has_app=false; fi
+          echo "has_app=${has_app}" | tee -a "$GITHUB_OUTPUT"
 
   web:
     needs: version
-    if: needs.version.outputs.release == 'true'
+    if: needs.version.outputs.release == 'true' && needs.version.outputs.has_app == 'true'
     runs-on: ubuntu-latest
     env:
       VERSION: ${{ needs.version.outputs.version }}
@@ -94,7 +92,7 @@ jobs:
 
   android:
     needs: version
-    if: needs.version.outputs.release == 'true'
+    if: needs.version.outputs.release == 'true' && needs.version.outputs.has_app == 'true'
     runs-on: ubuntu-latest
     env:
       VERSION: ${{ needs.version.outputs.version }}
@@ -155,9 +153,11 @@ jobs:
   publish:
     needs: [version, web, android]
     if: >-
-      needs.version.outputs.release == 'true'
-      && needs.web.result == 'success'
-      && needs.android.result == 'success'
+      always()
+      && needs.version.result == 'success'
+      && needs.version.outputs.release == 'true'
+      && contains(fromJSON('["success","skipped"]'), needs.web.result)
+      && contains(fromJSON('["success","skipped"]'), needs.android.result)
       && github.event.inputs.dry_run != 'true'
     runs-on: ubuntu-latest
     permissions:
@@ -166,13 +166,16 @@ jobs:
       GH_TOKEN: ${{ github.token }}
       VERSION: ${{ needs.version.outputs.version }}
     steps:
-      - uses: actions/download-artifact@v4
+      - if: needs.version.outputs.has_app == 'true'
+        uses: actions/download-artifact@v4
         with:
           path: dist
           merge-multiple: true
       - name: Tag and publish
         run: |
-          gh release create "v${VERSION}" dist/* \
+          files=()
+          if [ -d dist ]; then files=(dist/*); fi
+          gh release create "v${VERSION}" ${files[@]+"${files[@]}"} \
             --repo "$GITHUB_REPOSITORY" \
             --target "$GITHUB_SHA" \
             --title "v${VERSION}" \

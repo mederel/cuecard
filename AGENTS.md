@@ -6,7 +6,7 @@ Guidance for AI coding agents working on Cuecard. Humans: see README.md.
 
 Cuecard is an open-source app that helps actors learn their lines. You import a script, pick your character, and rehearse: the app gives you the cue (the line before yours), hides your lines progressively, and checks what you said. Scripts are mostly French. Linux first.
 
-The project is at the very beginning: one Cargo crate (`src/`), architecture decisions in `docs/adr/`, CI in `.github/workflows/ci.yml`, and the `main` branch ruleset in `.github/rulesets/`. Update this section as the layout grows.
+The project is at the very beginning: one Cargo crate (`src/`), architecture decisions in `docs/adr/`, specs and plans in `docs/superpowers/`, archived stories in `docs/stories/`, CI in `.github/workflows/ci.yml`, and the `main` branch ruleset in `.github/rulesets/`. Update this section as the layout grows.
 
 ## Build, test and format
 
@@ -55,7 +55,9 @@ The repository license has not been chosen yet (MIT or Apache-2.0 are the candid
 
 - Keep changes focused on the requested task.
 - The Superpowers plugin is enabled for this repo (`.claude/settings.json`). If Claude Code says it is enabled but not installed, run `/plugin install superpowers@claude-plugins-official` once. Use its skills: brainstorm before building something new, write a plan, then test-driven development, and verify before declaring a task finished.
-- Every feature is a user story written as a GitHub issue, not as a Markdown file. The issue holds the story ("As an actor, I want ... so that ..."), its acceptance criteria, design notes, and the implementation plan as a task list. Write it before the code, and do not open a pull request for a story that has no issue. Bug fixes and small chores need no story.
+- Every feature is a user story written as a GitHub issue: the story ("As an actor, I want ... so that ..."), its acceptance criteria, and links to its spec and plan.
+- Every story also has a spec and an implementation plan, both Markdown files committed with the code: the design in `docs/superpowers/specs/YYYY-MM-DD-<topic>-design.md` and the plan in `docs/superpowers/plans/YYYY-MM-DD-<topic>.md`. Write the issue, the spec and the plan before the code. A story without all three is not ready to open as a pull request. Bug fixes and small chores need none of them.
+- When a story issue is closed, its content is also kept in the repo. The pull request that closes it adds `docs/stories/<number>-<slug>.md` (title, story, acceptance criteria, link to the issue and to the closing PR). A story closed without a PR (won't do, duplicate) is archived the same way in a `docs:` PR.
 - Make small, reviewable commits with clear messages.
 - Preserve existing user changes. Avoid destructive Git operations (no force-push, no `reset --hard` on work you did not create).
 

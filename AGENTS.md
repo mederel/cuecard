@@ -55,13 +55,14 @@ The repository license has not been chosen yet (MIT or Apache-2.0 are the candid
 
 - Keep changes focused on the requested task.
 - The Superpowers plugin is enabled for this repo (`.claude/settings.json`). If Claude Code says it is enabled but not installed, run `/plugin install superpowers@claude-plugins-official` once. Use its skills: brainstorm before building something new, write a plan, then test-driven development, and verify before declaring a task finished.
-- Every feature has a spec and an implementation plan, both committed with it: the design in `docs/superpowers/specs/YYYY-MM-DD-<topic>-design.md` and the plan in `docs/superpowers/plans/YYYY-MM-DD-<topic>.md`. Write them before the code. Bug fixes and small chores need neither.
+- Every feature is a user story written as a GitHub issue, not as a Markdown file. The issue holds the story ("As an actor, I want ... so that ..."), its acceptance criteria, design notes, and the implementation plan as a task list. Write it before the code, and do not open a pull request for a story that has no issue. Bug fixes and small chores need no story.
 - Make small, reviewable commits with clear messages.
 - Preserve existing user changes. Avoid destructive Git operations (no force-push, no `reset --hard` on work you did not create).
 
 ## Pull requests
 
 - `main` is protected: no direct pushes. Work on a branch, open a pull request, and turn on auto-merge (`gh pr merge --auto --squash`). The `check` job must pass before anything merges.
+- The pull request description links its issue with `Closes #<number>`.
 - Pull request titles are Conventional Commits (`feat:`, `fix:`, `docs:`, `ci:`, `test:`, `refactor:`, `chore:`). PRs are squash-merged, so the title becomes the commit on `main`.
 - Before opening a pull request, refresh the local `main` from upstream (`git fetch origin main:main`, or `git switch main && git pull --ff-only`) and base the branch on it: the ruleset requires branches to be up to date with `main`.
 

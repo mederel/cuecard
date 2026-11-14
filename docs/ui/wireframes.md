@@ -1,0 +1,177 @@
+# Wireframes
+
+Basse fidélité, fenêtre de bureau Linux, textes en français. Les extraits viennent de *Tartuffe* de Molière (domaine public). Ce document est la référence du dépôt : les maquettes interactives (canevas Design) servent à les discuter, pas à les remplacer.
+
+Conventions : `[ Texte ]` est un bouton, `( )` et `(o)` un choix unique, `[ ]` et `[x]` une case à cocher, `[v]` une liste déroulante, `[#####-----]` une barre de progression. `[À DÉFINIR]` marque une décision ouverte.
+
+## Parcours
+
+```mermaid
+flowchart LR
+    B[1 Bibliothèque] --> R[2 Choix du rôle]
+    R --> P[3 Répétition]
+    P --> S[4 Résultat]
+    S -->|Réplique suivante| P
+    S -->|Réessayer| P
+    B --> G[5 Progression]
+    B --> V[6 Voix et audio]
+```
+
+## 1. Bibliothèque
+
+```text
++------------------------------------------------------------------------+
+| Cuecard                                                                |
++--------------------+---------------------------------------------------+
+| > Bibliothèque     |  Mes pièces            [Rechercher__] [Importer]  |
+|   Répétitions      |                                                   |
+|   Progression      |  +-------------+ +-------------+ +-------------+  |
+|   Voix et audio    |  | [image]     | | [image]     | | [image]     |  |
+|                    |  | Tartuffe    | | Cyrano de   | | Le Malade   |  |
+|                    |  | Molière     | | Bergerac    | | imaginaire  |  |
+|                    |  | Rôle: Elmire| | Rôle: Roxane| | Rôle: -     |  |
+|                    |  | [######---] | | [#---------]| | [----------]|  |
+|                    |  +-------------+ +-------------+ +-------------+  |
+|                    |                                                   |
+|                    |  +- - - - - - - - - - - - - - - - - - - - - - -+  |
+|                    |  |        Déposer un fichier ici               |  |
+|                    |  |  formats pris en charge : [À DÉFINIR]       |  |
+|                    |  +- - - - - - - - - - - - - - - - - - - - - - -+  |
++--------------------+---------------------------------------------------+
+```
+
+- Une carte montre le titre, l'auteur, le rôle choisi et la progression.
+- Cliquer une carte ouvre le choix du rôle.
+- Importer ouvre un sélecteur de fichier, ou on dépose le fichier dans la zone en bas.
+
+## 2. Choix du rôle
+
+```text
++------------------------------------------------------------------------+
+| < Bibliothèque                                                         |
+| Tartuffe   Molière · 5 actes                                           |
+|                                                                        |
+|  Qui joues-tu ?                          Séance                        |
+|  +----------------------------------+   +---------------------------+  |
+|  | ( ) Orgon         112 répliques  |   | Passage à répéter         |  |
+|  | (o) Elmire         74 répliques  |   | [v] Acte III, scène 2     |  |
+|  | ( ) Dorine         96 répliques  |   |                           |  |
+|  | ( ) Tartuffe       88 répliques  |   | Masquage au départ        |  |
+|  | ( ) Cléante        61 répliques  |   | [Complet][Initiales][Vide]|  |
+|  +----------------------------------+   |                           |  |
+|  Les autres personnages sont lus par    | [x] Lire la réplique      |  |
+|  la voix de synthèse.                   |     précédente à voix haute|  |
+|                                         | [x] Écouter ma réponse    |  |
+|                                         |                           |  |
+|                                         | [ Commencer la répétition]|  |
+|                                         +---------------------------+  |
++------------------------------------------------------------------------+
+```
+
+## 3. Répétition
+
+Écran central. Le niveau de masquage se change en cours de séance.
+
+```text
++------------------------------------------------------------------------+
+| < Quitter   Tartuffe · Acte III, scène 2     Réplique 12/74 [##------] |
+|             Je joue Elmire                                             |
+|             Masquage : [Complet] [Initiales] [Vide]                    |
++------------------------------------------------------------------------+
+|                                                                        |
+|     Dorine : [...]                                                     |
+|     Orgon : [...]                                                      |
+|                                                                        |
+|     +--------------------------------------------------------------+   |
+|     | RÉPLIQUE DONNÉE · Tartuffe                         [écouter] |   |
+|     | Couvrez ce sein que je ne saurais voir.                      |   |
+|     +--------------------------------------------------------------+   |
+|                                                                        |
+|     +==============================================================+   |
+|     | À MOI · Elmire                                               |   |
+|     | V____  ê___  d___  b___  t_____  à  l_  t_________  ?       |   |
+|     +==============================================================+   |
+|                                                                        |
+|            [ Indice ]   ( (micro) Je dis ma réplique )   [ Passer ]    |
+|                                                                        |
+|     Espace : parler · Entrée : révéler · Flèche droite : suivante      |
++------------------------------------------------------------------------+
+```
+
+Les trois niveaux de masquage de « À moi » :
+
+| Niveau | Affichage |
+| --- | --- |
+| Complet | `Vous êtes donc bien tendre à la tentation ?` |
+| Initiales | `V____ ê___ d___ b___ t_____ à l_ t_________ ?` |
+| Vide | `_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _` |
+
+## 4. Résultat de la réplique
+
+```text
++------------------------------------------------------------------------+
+| < Quitter   Tartuffe · Acte III, scène 2                 Réplique 12/74|
++------------------------------------------------------------------------+
+|  7 mots sur 8      Presque : un mot remplacé.                          |
+|                                                                        |
+|  TEXTE ATTENDU                                                         |
+|  +--------------------------------------------------------------+      |
+|  | Vous êtes donc [bien] tendre à la tentation ?                |      |
+|  +--------------------------------------------------------------+      |
+|  CE QUE J'AI DIT                                                       |
+|  +--------------------------------------------------------------+      |
+|  | Vous êtes donc ~~très~~ tendre à la tentation                |      |
+|  +--------------------------------------------------------------+      |
+|  [mot attendu]   ~~mot dit à la place~~                                |
+|  Accents et ponctuation ne comptent pas.                               |
+|                                                                        |
+|  Masquage : Initiales [Passer à « Vide »]    [ Réessayer ] [ Suivante ]|
++------------------------------------------------------------------------+
+```
+
+L'écart ne repose jamais sur la couleur seule : le mot attendu est entre crochets ou surligné, le mot dit à la place est barré.
+
+## 5. Progression
+
+```text
++------------------------------------------------------------------------+
+| Cuecard                                                                |
++--------------------+---------------------------------------------------+
+|   Bibliothèque     |  Progression · Tartuffe       Rôle: Elmire, 74 rép.|
+|   Répétitions      |                                                   |
+| > Progression      |  Par acte                    Répliques à revoir   |
+|   Voix et audio    |  Acte I   [#########-] 90 %  III,2 · n°12  3 err. |
+|                    |  Acte II  [#######---] 70 %  II,4  · n°7   2 err. |
+|                    |  Acte III [####------] 40 %  III,3 · n°2   2 err. |
+|                    |  Acte IV  [#---------] 10 %                       |
+|                    |  Acte V   [----------]  0 %  [ Répéter ces        |
+|                    |                                 répliques ]       |
++--------------------+---------------------------------------------------+
+```
+
+## 6. Voix et audio
+
+```text
++------------------------------------------------------------------------+
+| Cuecard                                                                |
++--------------------+---------------------------------------------------+
+|   Bibliothèque     |  Voix et audio                                    |
+|   Répétitions      |                                                   |
+|   Progression      |  Voix des autres personnages                      |
+| > Voix et audio    |  Voix      [v] Français (Siwis)                   |
+|                    |  Vitesse   [----o-----] 1,0×                      |
+|                    |  [ Écouter un exemple ]                           |
+|                    |                                                   |
+|                    |  Micro et reconnaissance                          |
+|                    |  Micro     [v] Micro intégré                      |
+|                    |  Niveau    [#####-----]                           |
+|                    |  [x] Tout traiter sur cet ordinateur              |
+|                    |  Moteur de reconnaissance vocale : [À DÉFINIR]    |
++--------------------+---------------------------------------------------+
+```
+
+## Décisions ouvertes
+
+- Formats de fichier acceptés à l'import des textes.
+- Moteur de reconnaissance vocale. La synthèse est décidée : Kokoro, voir [ADR 0001](../adr/0001-use-kokoro-for-tts.md).
+- Boîte à outils graphique de l'interface (non choisie).

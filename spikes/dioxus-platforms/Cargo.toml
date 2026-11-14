@@ -1,0 +1,5 @@
+# Throwaway spike for ADR 0002. The empty [workspace] keeps it separate from
+# the main crate and its CI.
+[workspace]
+members = ["core"]
+resolver = "3"

@@ -6,16 +6,17 @@ Work in `spikes/dioxus-platforms/`, one commit per task, Conventional Commit mes
 
 ## Task 1: Scaffold the spike
 
-- [ ] Create `spikes/dioxus-platforms/` with its own `Cargo.toml` containing an empty `[workspace]` table, and two members: `core` and `app`.
-- [ ] Pin the Dioxus version in `app`. Write `spikes/dioxus-platforms/README.md` with the tool versions (Rust, `dx`, Android SDK and NDK, WebKitGTK).
-- [ ] Check that the root `cargo test` and CI still do not see the spike.
+- [x] Create `spikes/dioxus-platforms/` with its own `Cargo.toml` containing an empty `[workspace]` table. Only `core` is a member for now (package `cuecard-spike-core`, since `core` is the standard library crate). `app` is added in task 3, because Dioxus cannot be downloaded in the Claude workspace.
+- [x] Write `spikes/dioxus-platforms/README.md` with the tool versions (Rust, `dx`, Android SDK and NDK, WebKitGTK), filled in as they are chosen.
+- [ ] Pin the Dioxus version in `app` (task 3).
+- [x] Check that the root `cargo test` and CI still do not see the spike.
 - Commit: `chore: scaffold the cross-platform spike`
 
 ## Task 2: Core crate, test first
 
-- [ ] Write failing tests for `normalise` (case, accents, curly and straight apostrophes, guillemets, punctuation) and for `matching_words(expected, said)`, using `Vous êtes donc bien tendre à la tentation ?` as the fixture.
-- [ ] Implement them without platform code or heavy dependencies.
-- [ ] Check it builds for `wasm32-unknown-unknown` and `aarch64-linux-android`.
+- [x] Write failing tests for `normalise` (case, accents, curly and straight apostrophes, guillemets, punctuation) and for `matching_words(expected, said)`, using `Vous êtes donc bien tendre à la tentation ?` as the fixture.
+- [x] Implement them without platform code or heavy dependencies. Matching is a longest common subsequence of words, so a replaced or missing word is missed and extra words are free.
+- [ ] Check it builds for `wasm32-unknown-unknown` and `aarch64-linux-android`. Not done: those targets are not installed in the Claude workspace.
 - Commit: `feat: add word matching to the spike core`
 
 ## Task 3: Rehearsal screen and both layouts

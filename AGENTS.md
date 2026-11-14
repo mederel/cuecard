@@ -34,7 +34,8 @@ Use these words consistently in code and docs:
 Read `docs/adr/` before changing architecture. Add a new numbered ADR for any significant decision.
 
 - **TTS: Kokoro** (ADR 0001), behind a small interface so the engine can be swapped. Rust integration is not decided yet.
-- **Platforms: Linux, Android and web.** Keep the core (scripts, matching, rehearsal logic) free of platform code so all three can share it. The UI toolkit is not decided: write an ADR before choosing one. Check that Kokoro and the speech recognition engine run on Android and in the browser before relying on them.
+- **Platforms: Linux, Android and web.** Keep the core (scripts, matching, rehearsal logic) free of platform code so all three can share it.
+- **UI: Dioxus** (ADR 0002), with the core in a separate pure-Rust crate. Run the spike described in the ADR before building features, and check that Kokoro and the speech recognition engine run on Android and in the browser before relying on them.
 - Do not use Breeze TTS 2 (non-commercial weights, no French) or Piper (GPL engine).
 
 ## Code conventions

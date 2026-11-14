@@ -1,0 +1,179 @@
+name: Release
+
+# On every push to main: compute the next semantic version from the
+# Conventional Commits since the last tag, build the web and Android
+# deliverables from `app/`, then tag and publish a GitHub release.
+#
+# Nothing is built or released until `app/Cargo.toml` exists.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: Build everything but do not tag or publish
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+# Runs queue one after another, so a tag is always created before the next
+# run counts commits from it.
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+env:
+  CARGO_TERM_COLOR: always
+  # Keep in step with the dioxus version in app/Cargo.toml.
+  DX_VERSION: "0.7.9"
+
+jobs:
+  version:
+    runs-on: ubuntu-latest
+    outputs:
+      release: ${{ steps.next.outputs.release }}
+      version: ${{ steps.next.outputs.version }}
+      bump: ${{ steps.next.outputs.bump }}
+      previous: ${{ steps.next.outputs.previous }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+      - id: next
+        run: |
+          out=$(bash .github/scripts/next-version.sh)
+          if [ ! -f app/Cargo.toml ]; then
+            echo "No app/Cargo.toml yet: nothing to deliver, no release."
+            out=$(printf '%s\n' "$out" | grep -v '^release=')
+            out+=$'\nrelease=false'
+          fi
+          echo "$out" | tee -a "$GITHUB_OUTPUT"
+
+  web:
+    needs: version
+    if: needs.version.outputs.release == 'true'
+    runs-on: ubuntu-latest
+    env:
+      VERSION: ${{ needs.version.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: app
+      - name: Cache the Dioxus CLI
+        id: dx-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cargo/bin/dx
+          key: dx-${{ env.DX_VERSION }}-${{ runner.os }}
+      - if: steps.dx-cache.outputs.cache-hit != 'true'
+        run: cargo install dioxus-cli --version "$DX_VERSION" --locked
+      - name: Stamp the version
+        run: sed -i "0,/^version = \".*\"/s//version = \"${VERSION}\"/" app/Cargo.toml
+      - name: Build the website
+        working-directory: app
+        run: dx bundle --platform web --release
+      - name: Zip the website
+        run: |
+          dir=$(find . -type d -path '*/target/dx/*/release/web/public' | head -n 1)
+          [ -n "$dir" ] || { echo "::error::web build output not found"; exit 1; }
+          mkdir -p dist
+          (cd "$dir" && zip -qr "$GITHUB_WORKSPACE/dist/cuecard-web-v${VERSION}.zip" .)
+      - uses: actions/upload-artifact@v4
+        with:
+          name: web
+          path: dist/*.zip
+          if-no-files-found: error
+
+  android:
+    needs: version
+    if: needs.version.outputs.release == 'true'
+    runs-on: ubuntu-latest
+    env:
+      VERSION: ${{ needs.version.outputs.version }}
+      KEYSTORE_B64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+      KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+      KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-linux-android,armv7-linux-androideabi,x86_64-linux-android
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: app
+      - name: Cache the Dioxus CLI
+        id: dx-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cargo/bin/dx
+          key: dx-${{ env.DX_VERSION }}-${{ runner.os }}
+      - if: steps.dx-cache.outputs.cache-hit != 'true'
+        run: cargo install dioxus-cli --version "$DX_VERSION" --locked
+      - name: Stamp the version
+        run: sed -i "0,/^version = \".*\"/s//version = \"${VERSION}\"/" app/Cargo.toml
+      - name: Build the Android package
+        working-directory: app
+        run: |
+          export NDK_HOME="${ANDROID_NDK_LATEST_HOME:-$ANDROID_NDK_HOME}"
+          dx bundle --platform android --release
+      - name: Collect the package
+        run: |
+          mkdir -p dist
+          found=$(find . -type f -path '*/target/dx/*' \( -name '*.apk' -o -name '*.aab' \) | head -n 1)
+          [ -n "$found" ] || { echo "::error::Android build output not found"; exit 1; }
+          ext="${found##*.}"
+          cp "$found" "dist/cuecard-android-v${VERSION}.${ext}"
+      - name: Sign the APK
+        if: env.KEYSTORE_B64 != ''
+        run: |
+          apk=$(ls dist/*.apk 2>/dev/null | head -n 1 || true)
+          [ -n "$apk" ] || { echo "Nothing to sign (not an APK)."; exit 0; }
+          echo "$KEYSTORE_B64" | base64 -d > "$RUNNER_TEMP/release.jks"
+          tools=$(ls -d "$ANDROID_HOME"/build-tools/* | sort -V | tail -n 1)
+          "$tools/zipalign" -f -p 4 "$apk" "$RUNNER_TEMP/aligned.apk"
+          "$tools/apksigner" sign --ks "$RUNNER_TEMP/release.jks" --ks-key-alias "$KEY_ALIAS" \
+            --ks-pass env:KEYSTORE_PASSWORD --out "$apk" "$RUNNER_TEMP/aligned.apk"
+          rm -f "$RUNNER_TEMP/release.jks"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: android
+          path: dist/*
+          if-no-files-found: error
+
+  publish:
+    needs: [version, web, android]
+    if: >-
+      needs.version.outputs.release == 'true'
+      && needs.web.result == 'success'
+      && needs.android.result == 'success'
+      && github.event.inputs.dry_run != 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      VERSION: ${{ needs.version.outputs.version }}
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+      - name: Tag and publish
+        run: |
+          gh release create "v${VERSION}" dist/* \
+            --repo "$GITHUB_REPOSITORY" \
+            --target "$GITHUB_SHA" \
+            --title "v${VERSION}" \
+            --generate-notes

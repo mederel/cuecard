@@ -1,5 +1,7 @@
 # Throwaway spike for ADR 0002. The empty [workspace] keeps it separate from
-# the main crate and its CI.
+# the main crate and its CI. `app` is its own workspace root (see its
+# Cargo.toml) so that `core` can be tested without downloading Dioxus.
 [workspace]
 members = ["core"]
+exclude = ["app"]
 resolver = "3"

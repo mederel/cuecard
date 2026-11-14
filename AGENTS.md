@@ -49,7 +49,7 @@ Read `docs/adr/` before changing architecture. Add a new numbered ADR for any si
 
 ## Licensing
 
-The repository license has not been chosen yet (MIT or Apache-2.0 are the candidates). Do not add a LICENSE file without asking.
+Cuecard is licensed under Apache-2.0 (`LICENSE`, and `license` in `Cargo.toml`). Contributions are made under the same license. Do not change the license without asking.
 
 ## Working conventions
 

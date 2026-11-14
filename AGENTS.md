@@ -51,3 +51,5 @@ The repository license has not been chosen yet (MIT or Apache-2.0 are the candid
 ## Workflow
 
 The Superpowers plugin is enabled for this repo (`.claude/settings.json`). If Claude Code says it is enabled but not installed, run `/plugin install superpowers@claude-plugins-official` once. Use its skills: brainstorm before building something new, write a plan, then test-driven development, and verify before declaring a task finished. Commit in small steps with clear messages.
+
+`main` is protected: no direct pushes. Work on a branch, open a pull request, and turn on auto-merge (`gh pr merge --auto --squash`). The `check` job from CI must pass before anything merges.

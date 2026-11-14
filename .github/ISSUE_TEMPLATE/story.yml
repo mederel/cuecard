@@ -1,0 +1,30 @@
+name: User story
+description: A feature, written as a user story.
+title: "As an actor, I want "
+labels: ["story"]
+body:
+  - type: textarea
+    id: story
+    attributes:
+      label: Story
+      description: "As an actor, I want ... so that ..."
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: What must be true for this story to be done.
+      placeholder: "- [ ] ..."
+    validations:
+      required: true
+  - type: input
+    id: spec
+    attributes:
+      label: Spec
+      description: Path of the spec in docs/superpowers/specs/ once it is written.
+  - type: input
+    id: plan
+    attributes:
+      label: Plan
+      description: Path of the plan in docs/superpowers/plans/ once it is written.

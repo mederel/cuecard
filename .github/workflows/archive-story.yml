@@ -1,0 +1,68 @@
+name: Archive story
+
+# When a story issue is closed, open a pull request that stores it in
+# docs/stories/ and let it auto-merge once CI passes.
+
+on:
+  issues:
+    types: [closed]
+
+permissions:
+  contents: write
+  pull-requests: write
+  actions: write
+
+concurrency:
+  group: archive-story-${{ github.event.issue.number }}
+
+jobs:
+  archive:
+    if: contains(github.event.issue.labels.*.name, 'story')
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      REPO: ${{ github.repository }}
+      ISSUE_NUMBER: ${{ github.event.issue.number }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Write the story file
+        env:
+          ISSUE_TITLE: ${{ github.event.issue.title }}
+          ISSUE_BODY: ${{ github.event.issue.body }}
+          ISSUE_URL: ${{ github.event.issue.html_url }}
+          STATE_REASON: ${{ github.event.issue.state_reason }}
+          CLOSED_AT: ${{ github.event.issue.closed_at }}
+        run: |
+          # The commit that closed the issue, if any, tells us the closing PR.
+          closing_sha=$(gh api "repos/$REPO/issues/$ISSUE_NUMBER/timeline" --paginate \
+            --jq '.[] | select(.event == "closed") | .commit_id // empty' | tail -n 1)
+          if [ -n "$closing_sha" ]; then
+            CLOSING_PR=$(gh api "repos/$REPO/commits/$closing_sha/pulls" --jq '.[0].number // empty')
+            export CLOSING_PR
+          fi
+          bash .github/scripts/archive-story.sh
+
+      - name: Open the pull request
+        run: |
+          if [ -z "$(git status --porcelain docs/stories)" ]; then
+            echo "Story already archived."
+            exit 0
+          fi
+          branch="archive/story-$ISSUE_NUMBER"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git switch -c "$branch"
+          git add docs/stories
+          git commit -m "docs: archive story #$ISSUE_NUMBER"
+          git push --force origin "$branch"
+          if [ -z "$(gh pr list --head "$branch" --state open --json number --jq '.[0].number // empty')" ]; then
+            gh pr create --base main --head "$branch" \
+              --title "docs: archive story #$ISSUE_NUMBER" \
+              --body "Stores story #$ISSUE_NUMBER in the repository now that it is closed."
+          fi
+          # Pull requests opened with GITHUB_TOKEN do not start workflows, so
+          # run CI by hand on the branch: the required check attaches to the
+          # same commit.
+          gh workflow run ci.yml --ref "$branch"
+          gh pr merge "$branch" --auto --squash

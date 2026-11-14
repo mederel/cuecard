@@ -12,6 +12,9 @@
 #   minor  feat
 #   patch  fix, perf, revert
 #   none   anything else (docs, ci, test, chore, style, build, refactor)
+# The major version is on hold: while it is 0, a breaking change raises the
+# minor version instead (0.3.2 -> 0.4.0), so the project never reaches 1.0.0
+# by accident. Moving to 1.0.0 is a deliberate step (see AGENTS.md).
 # With no release tag yet, the first release is the version in Cargo.toml (or
 # BASE_VERSION), as soon as one releasable commit exists.
 set -euo pipefail
@@ -61,6 +64,10 @@ elif [ -z "$last" ]; then
   bump="initial"
 else
   IFS=. read -r major minor patch <<<"${last#v}"
+  if [ "$bump" = "major" ] && [ "$major" -eq 0 ]; then
+    echo "Major version is on hold (0.x): breaking change released as a minor." >&2
+    bump="minor"
+  fi
   case "$bump" in
     major) version="$((major + 1)).0.0" ;;
     minor) version="${major}.$((minor + 1)).0" ;;

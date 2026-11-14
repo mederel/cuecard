@@ -4,7 +4,7 @@ Guidance for AI coding agents working on Cuecard. Humans: see README.md.
 
 ## Project status
 
-Cuecard is an open-source app that helps actors learn their lines. You import a script, pick your character, and rehearse: the app gives you the cue (the line before yours), hides your lines progressively, and checks what you said. Scripts are mostly French. Linux first.
+Cuecard is an open-source app that helps actors learn their lines. You import a script, pick your character, and rehearse: the app gives you the cue (the line before yours), hides your lines progressively, and checks what you said. Scripts are mostly French. Targets: Linux desktop, Android and the web, with one adaptive UI (see `docs/ui/wireframes.md`).
 
 The project is at the very beginning: one Cargo crate (`src/`), architecture decisions in `docs/adr/`, specs and plans in `docs/superpowers/`, UI wireframes in `docs/ui/`, archived stories in `docs/stories/`, CI in `.github/workflows/ci.yml`, and the `main` branch ruleset in `.github/rulesets/`. Update this section as the layout grows.
 
@@ -34,6 +34,7 @@ Use these words consistently in code and docs:
 Read `docs/adr/` before changing architecture. Add a new numbered ADR for any significant decision.
 
 - **TTS: Kokoro** (ADR 0001), behind a small interface so the engine can be swapped. Rust integration is not decided yet.
+- **Platforms: Linux, Android and web.** Keep the core (scripts, matching, rehearsal logic) free of platform code so all three can share it. The UI toolkit is not decided: write an ADR before choosing one. Check that Kokoro and the speech recognition engine run on Android and in the browser before relying on them.
 - Do not use Breeze TTS 2 (non-commercial weights, no French) or Piper (GPL engine).
 
 ## Code conventions

@@ -1,6 +1,6 @@
 # Wireframes
 
-Basse fidélité, fenêtre de bureau Linux, textes en français. Les extraits viennent de *Tartuffe* de Molière (domaine public). Ce document est la référence du dépôt : les maquettes interactives (canevas Design) servent à les discuter, pas à les remplacer.
+Basse fidélité, textes en français. Les six écrans ci-dessous sont dessinés en version bureau (Linux, navigateur large) ; la section « Android et web » donne leur adaptation aux petits écrans. Les extraits viennent de *Tartuffe* de Molière (domaine public). Ce document est la référence du dépôt : les maquettes interactives (canevas Design) servent à les discuter, pas à les remplacer.
 
 Conventions : `[ Texte ]` est un bouton, `( )` et `(o)` un choix unique, `[ ]` et `[x]` une case à cocher, `[v]` une liste déroulante, `[#####-----]` une barre de progression. `[À DÉFINIR]` marque une décision ouverte.
 
@@ -170,8 +170,121 @@ L'écart ne repose jamais sur la couleur seule : le mot attendu est entre croche
 +--------------------+---------------------------------------------------+
 ```
 
+## Android et web
+
+Cuecard vise trois cibles avec la même interface adaptative : le bureau Linux, Android et le web (navigateur, y compris sur téléphone). Les écrans et le parcours sont identiques ; seule la mise en page change.
+
+### Points de rupture
+
+| Largeur | Mise en page |
+| --- | --- |
+| 900 px et plus | Barre latérale à gauche (écrans 1 à 6 ci-dessus) |
+| moins de 900 px | Une seule colonne, navigation en barre du bas (3 onglets : Bibliothèque, Progression, Réglages) |
+
+### Adaptations sur petit écran
+
+- Cibles tactiles d'au moins 48 px. Le bouton « Je dis ma réplique » occupe toute la largeur, dans la zone du pouce.
+- Pas de raccourcis clavier : « Révéler » et « Passer » deviennent des boutons, et glisser vers la gauche passe à la réplique suivante.
+- Le choix du rôle et les réglages de séance s'empilent : d'abord le rôle, puis les réglages dans une feuille qui monte du bas.
+- Le résultat remplace la zone de réplique, sans changer d'écran, pour garder le micro à portée.
+
+### Bibliothèque (téléphone)
+
+```text
++------------------------+
+| Cuecard   [Importer]   |
++------------------------+
+| [Rechercher__________] |
+|                        |
+| +--------------------+ |
+| | Tartuffe           | |
+| | Molière · Elmire   | |
+| | [######-----] 62 % | |
+| +--------------------+ |
+| +--------------------+ |
+| | Cyrano de Bergerac | |
+| | Rostand · Roxane   | |
+| | [#----------] 15 % | |
+| +--------------------+ |
+| +--------------------+ |
+| | Le Malade imaginai | |
+| | Rôle non choisi    | |
+| +--------------------+ |
+|                        |
++------------------------+
+| Biblio | Progr. | Régl.|
++------------------------+
+```
+
+### Répétition (téléphone)
+
+```text
++------------------------+
+| <  III, 2    12/74 [#-]|
+| [Complet][Initiales][V]|
++------------------------+
+|                        |
+| RÉPLIQUE DONNÉE        |
+| Tartuffe       [écouter]|
+| Couvrez ce sein que je |
+| ne saurais voir.       |
+|                        |
+| ====================== |
+| À MOI · Elmire         |
+| V____ ê___ d___ b___   |
+| t_____ à l_ t_________ |
+| ?                      |
+| ====================== |
+|                        |
+| [Indice]      [Passer] |
+|                        |
+| +--------------------+ |
+| |  (micro) Je dis    | |
+| |  ma réplique       | |
+| +--------------------+ |
++------------------------+
+```
+
+### Résultat (téléphone)
+
+```text
++------------------------+
+| <  III, 2    12/74 [#-]|
++------------------------+
+| 7 mots sur 8           |
+| Presque : un mot       |
+| remplacé.              |
+|                        |
+| TEXTE ATTENDU          |
+| Vous êtes donc [bien]  |
+| tendre à la tentation ?|
+|                        |
+| CE QUE J'AI DIT        |
+| Vous êtes donc ~~très~~|
+| tendre à la tentation  |
+|                        |
+| Masquage : Initiales   |
+| [Passer à « Vide »]    |
+|                        |
+| [Réessayer]            |
+| [Réplique suivante]    |
++------------------------+
+```
+
+### Différences par plateforme
+
+| Sujet | Linux | Android | Web |
+| --- | --- | --- | --- |
+| Import d'un texte | Sélecteur de fichier ou dépôt | Sélecteur système, ou partage vers Cuecard | Sélecteur ou dépôt dans la page |
+| Micro | Accès direct | Permission demandée au premier usage | Permission du navigateur, page en HTTPS |
+| Retour | Bouton « Bibliothèque » | Bouton ou geste retour du système | Bouton retour du navigateur |
+| Textes et progression | Fichiers locaux | Stockage de l'appli | Stockage du navigateur, installable en appli (PWA) |
+| Hors ligne | Oui | Oui | Oui après le premier chargement (à valider) |
+
 ## Décisions ouvertes
 
 - Formats de fichier acceptés à l'import des textes.
 - Moteur de reconnaissance vocale. La synthèse est décidée : Kokoro, voir [ADR 0001](../adr/0001-use-kokoro-for-tts.md).
-- Boîte à outils graphique de l'interface (non choisie).
+- Boîte à outils graphique de l'interface : une seule base de code pour Linux, Android et le web (non choisie, ADR à écrire).
+- Voix de synthèse et reconnaissance vocale sur Android et dans le navigateur : Kokoro tourne-t-il hors ligne sur téléphone et en WebAssembly ? À valider avant de s'engager (voir ADR 0001).
+- Poids des modèles : téléchargés au premier lancement, jamais commités.

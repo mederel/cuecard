@@ -1,0 +1,60 @@
+:root {
+  --ink: #1e1b3a;
+  --ground: #f4f4f2;
+  --panel: #ffffff;
+  --line: #8a8a85;
+  --muted: #5c5c58;
+  --gold: #f2b544;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  background: var(--ground);
+  color: #222;
+}
+button, input { font: inherit; }
+button {
+  min-height: 48px;
+  padding: 0 18px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--panel);
+  color: #222;
+}
+button.primary { background: var(--ink); color: #fff; border-color: var(--ink); font-weight: 600; }
+button[aria-pressed="true"] { background: var(--ink); color: #fff; font-weight: 600; }
+
+/* Phone layout first: one column, navigation at the bottom. */
+.app { min-height: 100vh; display: flex; flex-direction: column-reverse; }
+.nav { display: flex; border-top: 1px solid #bdbdb8; background: #ebebe8; }
+.nav a {
+  flex: 1; display: flex; align-items: center; justify-content: center;
+  min-height: 56px; color: #222; text-decoration: none;
+}
+.nav a.active { background: var(--ink); color: #fff; font-weight: 600; }
+.screen { flex: 1; display: flex; flex-direction: column; gap: 14px; padding: 16px; }
+.bar { display: flex; flex-direction: column; gap: 10px; }
+.levels { display: flex; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+.levels button { flex: 1; border: 0; border-radius: 0; border-left: 1px solid var(--line); min-height: 44px; }
+.levels button:first-child { border-left: 0; }
+.card { padding: 16px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; }
+.card.mine { border: 2px solid var(--ink); }
+.label { font-size: 12px; letter-spacing: 0.04em; text-transform: uppercase; color: var(--muted); }
+.text { font-size: 20px; margin-top: 6px; }
+.mine .text { letter-spacing: 0.02em; white-space: pre-wrap; }
+.row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+.meter { flex: 1; min-width: 120px; height: 12px; background: #e2e2de; border-radius: 6px; }
+.meter > div { height: 12px; background: var(--ink); border-radius: 6px; }
+.note { font-size: 14px; color: var(--muted); }
+.field { display: flex; flex-direction: column; gap: 6px; }
+.field input { min-height: 48px; padding: 0 12px; border: 1px solid var(--line); border-radius: 6px; }
+
+/* Desktop layout: sidebar on the left. */
+@media (min-width: 900px) {
+  .app { flex-direction: row; }
+  .nav { width: 220px; flex-direction: column; gap: 4px; padding: 20px 12px; border-top: 0; border-right: 1px solid #bdbdb8; }
+  .nav a { flex: none; justify-content: flex-start; min-height: 44px; padding: 0 12px; border-radius: 6px; }
+  .screen { padding: 28px 40px; max-width: 880px; }
+  .bar { flex-direction: row; align-items: center; justify-content: space-between; }
+}

@@ -59,6 +59,32 @@ pub fn matching_words(expected: &str, said: &str) -> Match {
     }
 }
 
+/// Keeps the first letter of each word and hides the others with `_`.
+/// Punctuation, apostrophes, hyphens and spaces are kept as they are.
+pub fn initials(line: &str) -> String {
+    let mut at_word_start = true;
+    line.chars()
+        .map(|c| {
+            if !c.is_alphabetic() {
+                at_word_start = true;
+                c
+            } else if at_word_start {
+                at_word_start = false;
+                c
+            } else {
+                '_'
+            }
+        })
+        .collect()
+}
+
+/// Hides every letter with `_`, keeping punctuation and spaces.
+pub fn blank(line: &str) -> String {
+    line.chars()
+        .map(|c| if c.is_alphabetic() { '_' } else { c })
+        .collect()
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -181,5 +207,35 @@ mod tests {
                 total: 0
             }
         );
+    }
+
+    #[test]
+    fn initials_keeps_the_first_letter_of_each_word() {
+        assert_eq!(
+            initials("Vous êtes donc bien tendre à la tentation ?"),
+            "V___ ê___ d___ b___ t_____ à l_ t________ ?"
+        );
+    }
+
+    #[test]
+    fn initials_restarts_after_apostrophes_and_hyphens() {
+        assert_eq!(initials("l’amour, dit-il"), "l’a____, d__-i_");
+    }
+
+    #[test]
+    fn initials_keeps_accented_and_ligature_letters_as_one_char() {
+        assert_eq!(initials("Œuvre élève"), "Œ____ é____");
+    }
+
+    #[test]
+    fn blank_hides_every_letter() {
+        assert_eq!(blank("Vous êtes donc ?"), "____ ____ ____ ?");
+        assert_eq!(blank("l’amour"), "_’_____");
+    }
+
+    #[test]
+    fn hiding_an_empty_line_gives_an_empty_line() {
+        assert_eq!(initials(""), "");
+        assert_eq!(blank(""), "");
     }
 }

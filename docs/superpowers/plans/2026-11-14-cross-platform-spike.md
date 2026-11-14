@@ -21,15 +21,15 @@ Work in `spikes/dioxus-platforms/`, one commit per task, Conventional Commit mes
 
 ## Task 3: Rehearsal screen and both layouts
 
-- [ ] Build the rehearsal screen from the wireframe with the three hiding-level buttons, using the core crate for the hidden text.
-- [ ] Write the CSS: sidebar at 900 px and above, one column and a bottom bar below. Touch targets of 48 px.
+- [x] Build the rehearsal screen from the wireframe with the three hiding-level buttons, using the core crate for the hidden text. Written but not compiled (no network in the Claude workspace to fetch Dioxus). `initials` and `blank` were added to the core crate, test first.
+- [x] Write the CSS: sidebar at 900 px and above, one column and a bottom bar below. Touch targets of 48 px. Written, not yet seen on a screen.
 - [ ] Run it on Linux with `dx serve --desktop` and in a browser with `dx serve --web`. Fill the "builds", "layouts" and "accents" rows for both.
 - Commit: `feat: add the rehearsal screen to the spike`
 
 ## Task 4: Microphone level and generated tone
 
-- [ ] Add the microphone button: request access, show a live level. Use the browser media APIs through `web-sys` on web and in the WebViews.
-- [ ] Add the tone button, generated in code. Do not commit any audio file.
+- [x] Add the microphone button: request access, show a live level. Done with JavaScript through `document::eval` on every target instead of `web-sys`, so one code path covers the browser and both WebViews. Not run yet.
+- [x] Add the tone button, generated in code (Web Audio oscillator). No audio file committed. Not run yet.
 - [ ] Test in the browser over `localhost` and over HTTPS, and on Linux desktop. Fill the microphone and tone rows.
 - Commit: `feat: add microphone level and tone to the spike`
 

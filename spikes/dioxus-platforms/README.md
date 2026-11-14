@@ -7,15 +7,27 @@ This folder is its own Cargo workspace, separate from the main crate and from CI
 ## Layout
 
 - `core/`: package `cuecard-spike-core`, pure Rust with no dependencies. Normalises French text and counts matching words. (The folder is `core`, but the package cannot be named `core`, which is the standard library crate.)
-- `app/`: the Dioxus UI. Not added yet: it is created in plan task 3, on a machine that can download Dioxus and has the Android tooling.
+- `app/`: the Dioxus UI, the rehearsal screen from the wireframes with the three hiding levels, a microphone level meter, a generated tone, and a text field that counts matching words. It is its own Cargo workspace so that `core` can be tested without downloading Dioxus. **Written but never compiled**: the Claude workspace has no network access to fetch Dioxus. Expect to fix compile errors on the first build.
 
 ## Commands
+
+In `spikes/dioxus-platforms/` (the `core` crate):
 
 ```sh
 cargo fmt --check
 cargo clippy --all-targets -- -D warnings
 cargo test
 ```
+
+In `spikes/dioxus-platforms/app/` (needs the Dioxus CLI: `cargo install dioxus-cli --version 0.7.9 --locked`, and `rustup target add wasm32-unknown-unknown`):
+
+```sh
+dx serve --web                      # browser, http://localhost:8080
+dx serve --desktop --no-default-features --features desktop
+dx serve --android --no-default-features --features mobile
+```
+
+The microphone needs `localhost` or HTTPS in the browser. On Android it also needs the `RECORD_AUDIO` permission and a handler that grants the WebView's capture request (plan task 5): this is not written yet, and the app will report `NotAllowedError` until it is.
 
 ## Tool versions
 
@@ -24,7 +36,7 @@ Fill in as the spike progresses.
 | Tool | Version |
 | --- | --- |
 | Rust | 1.97.0 (stable) |
-| Dioxus and `dx` | not chosen yet |
+| Dioxus and `dx` | 0.7.9 (pinned in `app/Cargo.toml`, same as `DX_VERSION` in `release.yml`) |
 | Android SDK, NDK | not chosen yet |
 | WebKitGTK | not checked yet |
 

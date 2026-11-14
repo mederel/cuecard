@@ -1,0 +1,20 @@
+[package]
+name = "cuecard-spike-app"
+version = "0.0.0"
+edition = "2024"
+license = "Apache-2.0"
+publish = false
+
+# Its own workspace root: lets the parent workspace stay free of Dioxus.
+[workspace]
+
+[dependencies]
+cuecard-spike-core = { path = "../core" }
+dioxus = { version = "=0.7.9", features = [] }
+serde = { version = "1", features = ["derive"] }
+
+[features]
+default = ["web"]
+web = ["dioxus/web"]
+desktop = ["dioxus/desktop"]
+mobile = ["dioxus/mobile"]

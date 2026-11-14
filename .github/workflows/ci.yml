@@ -4,6 +4,7 @@ on:
   push:
     branches: [main]
   pull_request:
+    types: [opened, edited, synchronize, reopened]
   workflow_dispatch:
 
 env:
@@ -14,6 +15,22 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Pull request title is a Conventional Commit
+        if: github.event_name == 'pull_request'
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
+        run: bash .github/scripts/check-conventional.sh "$PR_TITLE"
+      - name: Commit messages are Conventional Commits
+        if: github.event_name == 'pull_request'
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          mapfile -t subjects < <(git log --no-merges --format=%s "$BASE_SHA..$HEAD_SHA")
+          [ "${#subjects[@]}" -gt 0 ] || { echo "No commits to check."; exit 0; }
+          bash .github/scripts/check-conventional.sh "${subjects[@]}"
       - uses: dtolnay/rust-toolchain@stable
         with:
           components: rustfmt, clippy

@@ -6,7 +6,7 @@ Guidance for AI coding agents working on Cuecard. Humans: see README.md.
 
 Cuecard is an open-source app that helps actors learn their lines. You import a script, pick your character, and rehearse: the app gives you the cue (the line before yours), hides your lines progressively, and checks what you said. Scripts are mostly French. Targets: Linux desktop, Android and the web, with one adaptive UI (see `docs/ui/wireframes.md`).
 
-The project is at the very beginning: one Cargo crate (`src/`), architecture decisions in `docs/adr/`, specs and plans in `docs/superpowers/`, UI wireframes in `docs/ui/`, archived stories in `docs/stories/`, CI in `.github/workflows/ci.yml`, and the `main` branch ruleset in `.github/rulesets/`. Update this section as the layout grows.
+The project is at the very beginning: one Cargo crate (`src/`), architecture decisions in `docs/adr/`, specs and plans in `docs/superpowers/`, UI wireframes in `docs/ui/`, archived stories in `docs/stories/`, CI in `.github/workflows/ci.yml`, releases in `.github/workflows/release.yml`, and the `main` branch ruleset in `.github/rulesets/`. Update this section as the layout grows.
 
 ## Build, test and format
 
@@ -69,6 +69,14 @@ Cuecard is licensed under Apache-2.0 (`LICENSE`, and `license` in `Cargo.toml`).
 - The pull request description links its issue with `Closes #<number>`.
 - Pull request titles and every commit message are Conventional Commits: `<type>[(scope)][!]: <description>`, with a type among `feat`, `fix`, `docs`, `ci`, `test`, `refactor`, `chore`, `perf`, `build`, `style`, `revert`, and 100 characters at most. CI enforces this in the `check` job (`.github/scripts/check-conventional.sh`). PRs are squash-merged, so the title becomes the commit on `main`.
 - Before opening a pull request, refresh the local `main` from upstream (`git fetch origin main:main`, or `git switch main && git pull --ff-only`) and base the branch on it: the ruleset requires branches to be up to date with `main`.
+
+## Releases
+
+- Versions follow semantic versioning and are computed from Conventional Commit titles since the last `vX.Y.Z` tag (`.github/scripts/next-version.sh`): a `!` before the colon or a `BREAKING CHANGE:` footer is a **major**, `feat` is a **minor**, `fix`, `perf` and `revert` are a **patch**. Other types (`docs`, `ci`, `test`, `chore`, `style`, `build`, `refactor`) release nothing on their own. The first release uses the version in `Cargo.toml`.
+- Pick the PR title with this in mind: it becomes the commit that decides the next version. A title that wrongly omits `!` ships a breaking change as a minor.
+- The `release` workflow (`.github/workflows/release.yml`) runs on every push to `main`. It builds the website and the Android package from `app/` (a Dioxus project, not created yet), then tags the commit and publishes a GitHub release with `cuecard-web-v<version>.zip` and `cuecard-android-v<version>.apk`. It does nothing until `app/Cargo.toml` exists. Do not create tags by hand.
+- The release version is stamped into `app/Cargo.toml` at build time and is not committed back: the tag is the source of truth.
+- Optional secrets for a signed APK: `ANDROID_KEYSTORE_BASE64`, `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS`.
 
 ## Bug fixes
 

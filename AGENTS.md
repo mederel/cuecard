@@ -55,9 +55,9 @@ The repository license has not been chosen yet (MIT or Apache-2.0 are the candid
 
 - Keep changes focused on the requested task.
 - The Superpowers plugin is enabled for this repo (`.claude/settings.json`). If Claude Code says it is enabled but not installed, run `/plugin install superpowers@claude-plugins-official` once. Use its skills: brainstorm before building something new, write a plan, then test-driven development, and verify before declaring a task finished.
-- Every feature is a user story written as a GitHub issue: the story ("As an actor, I want ... so that ..."), its acceptance criteria, and links to its spec and plan.
+- Every feature is a user story written as a GitHub issue, created from the "User story" template (it adds the `story` label). The issue holds the story ("As an actor, I want ... so that ..."), its acceptance criteria, and links to its spec and plan.
 - Every story also has a spec and an implementation plan, both Markdown files committed with the code: the design in `docs/superpowers/specs/YYYY-MM-DD-<topic>-design.md` and the plan in `docs/superpowers/plans/YYYY-MM-DD-<topic>.md`. Write the issue, the spec and the plan before the code. A story without all three is not ready to open as a pull request. Bug fixes and small chores need none of them.
-- When a story issue is closed, its content is also kept in the repo. The pull request that closes it adds `docs/stories/<number>-<slug>.md` (title, story, acceptance criteria, link to the issue and to the closing PR). A story closed without a PR (won't do, duplicate) is archived the same way in a `docs:` PR.
+- When a story issue is closed, its content is also kept in the repo. The `archive-story` workflow (`.github/workflows/archive-story.yml`) opens a pull request that adds `docs/stories/<number>-<slug>.md` (title, story, acceptance criteria, link to the issue and to the closing PR) and turns on auto-merge. Do not write those files by hand. Only issues with the `story` label are archived.
 - Make small, reviewable commits with clear messages.
 - Preserve existing user changes. Avoid destructive Git operations (no force-push, no `reset --hard` on work you did not create).
 

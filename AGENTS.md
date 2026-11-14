@@ -65,7 +65,7 @@ Cuecard is licensed under Apache-2.0 (`LICENSE`, and `license` in `Cargo.toml`).
 
 - `main` is protected: no direct pushes. Work on a branch, open a pull request, and turn on auto-merge (`gh pr merge --auto --squash`). The `check` job must pass before anything merges.
 - The pull request description links its issue with `Closes #<number>`.
-- Pull request titles are Conventional Commits (`feat:`, `fix:`, `docs:`, `ci:`, `test:`, `refactor:`, `chore:`). PRs are squash-merged, so the title becomes the commit on `main`.
+- Pull request titles and every commit message are Conventional Commits: `<type>[(scope)][!]: <description>`, with a type among `feat`, `fix`, `docs`, `ci`, `test`, `refactor`, `chore`, `perf`, `build`, `style`, `revert`, and 100 characters at most. CI enforces this in the `check` job (`.github/scripts/check-conventional.sh`). PRs are squash-merged, so the title becomes the commit on `main`.
 - Before opening a pull request, refresh the local `main` from upstream (`git fetch origin main:main`, or `git switch main && git pull --ff-only`) and base the branch on it: the ruleset requires branches to be up to date with `main`.
 
 ## Bug fixes

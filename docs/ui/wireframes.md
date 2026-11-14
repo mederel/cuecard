@@ -285,6 +285,6 @@ Cuecard vise trois cibles avec la même interface adaptative : le bureau Linux, 
 
 - Formats de fichier acceptés à l'import des textes.
 - Moteur de reconnaissance vocale. La synthèse est décidée : Kokoro, voir [ADR 0001](../adr/0001-use-kokoro-for-tts.md).
-- Boîte à outils graphique de l'interface : une seule base de code pour Linux, Android et le web (non choisie, ADR à écrire).
+- Boîte à outils graphique : Dioxus, voir [ADR 0002](../adr/0002-use-dioxus-for-the-ui.md), sous réserve d'un prototype (micro, audio et mise en page sur les trois cibles).
 - Voix de synthèse et reconnaissance vocale sur Android et dans le navigateur : Kokoro tourne-t-il hors ligne sur téléphone et en WebAssembly ? À valider avant de s'engager (voir ADR 0001).
 - Poids des modèles : téléchargés au premier lancement, jamais commités.

@@ -10,7 +10,7 @@ publish = false
 
 [dependencies]
 cuecard-spike-core = { path = "../core" }
-dioxus = { version = "=0.7.9", features = [] }
+dioxus = { version = "=0.7.10", features = [] }
 serde = { version = "1", features = ["derive"] }
 
 [features]

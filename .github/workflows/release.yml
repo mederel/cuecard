@@ -67,7 +67,7 @@ jobs:
           workspaces: app
       - name: Cache the Dioxus CLI
         id: dx-cache
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: ~/.cargo/bin/dx
           key: dx-${{ env.DX_VERSION }}-${{ runner.os }}
@@ -113,7 +113,7 @@ jobs:
           workspaces: app
       - name: Cache the Dioxus CLI
         id: dx-cache
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: ~/.cargo/bin/dx
           key: dx-${{ env.DX_VERSION }}-${{ runner.os }}

@@ -84,7 +84,7 @@ jobs:
           [ -n "$dir" ] || { echo "::error::web build output not found"; exit 1; }
           mkdir -p dist
           (cd "$dir" && zip -qr "$GITHUB_WORKSPACE/dist/cuecard-web-v${VERSION}.zip" .)
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: web
           path: dist/*.zip
@@ -144,7 +144,7 @@ jobs:
           "$tools/apksigner" sign --ks "$RUNNER_TEMP/release.jks" --ks-key-alias "$KEY_ALIAS" \
             --ks-pass env:KEYSTORE_PASSWORD --out "$apk" "$RUNNER_TEMP/aligned.apk"
           rm -f "$RUNNER_TEMP/release.jks"
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: android
           path: dist/*
@@ -167,7 +167,7 @@ jobs:
       VERSION: ${{ needs.version.outputs.version }}
     steps:
       - if: needs.version.outputs.has_app == 'true'
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           path: dist
           merge-multiple: true
